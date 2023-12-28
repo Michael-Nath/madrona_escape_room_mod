@@ -17,6 +17,7 @@ enum class RoomType : uint32_t {
     DoubleButton,
     CubeBlocking,
     CubeButtons,
+    SinglePortalButton,
     NumTypes,
 };
 
@@ -328,6 +329,28 @@ static void makeEndWall(Engine &ctx,
     room.door = door;
 }
 
+// 
+static Entity makePortal(Engine &ctx,
+                         float portal_x,
+                         float portal_y)
+{
+   Entity portal = ctx.makeRenderableEntity<PortalEntity>(); 
+   ctx.get<Position>(portal) = Vector3 {
+        portal_x,
+        portal_y,
+        0.f,
+    };
+    ctx.get<Rotation>(portal) = Quat { 1, 0, 0, 0 };
+    ctx.get<Scale>(portal) = Diag3x3 {
+        consts::portalWidth,
+        consts::portalWidth,
+        0.2f,
+    };
+    ctx.get<ObjectID>(portal) = ObjectID { (int32_t)SimObject::Portal };
+
+    return portal;
+}
+
 static Entity makeButton(Engine &ctx,
                          float button_x,
                          float button_y)
@@ -391,6 +414,26 @@ static void setupDoor(Engine &ctx,
     }
     props.numButtons = (int32_t)buttons.size();
     props.isPersistent = is_persistent;
+}
+
+// A room with a single portal that an agent needs to step on, the game ends
+static CountT makeSinglePortalRoom(Engine &ctx, 
+                                    Room &room, 
+                                    float y_min,
+                                    float y_max)
+{
+    float portal_x = randInRangeCentered(ctx,
+        consts::worldWidth / 2.f - consts::portalWidth);
+    float portal_y = randBetween(ctx, y_min + consts::roomLength / 4.f,
+        y_max - consts::wallWidth - consts::portalWidth / 2.f);
+
+    Entity portal = makePortal(ctx, portal_x, portal_y);
+
+    setupDoor(ctx, room.door, { portal }, true);
+
+    room.entities[0] = portal;
+
+    return 1;
 }
 
 // A room with a single button that needs to be pressed, the door stays open.
@@ -594,6 +637,10 @@ static void makeRoom(Engine &ctx,
         num_room_entities =
             makeCubeButtonsRoom(ctx, room, room_y_min, room_y_max);
     } break;
+    case RoomType::SinglePortalButton: {
+        num_room_entities = 
+            makeSinglePortalRoom(ctx, room, room_y_min, room_y_max);
+    } break;
     default: MADRONA_UNREACHABLE();
     }
 
@@ -612,6 +659,7 @@ static void generateLevel(Engine &ctx)
     makeRoom(ctx, level, 0, RoomType::DoubleButton);
     makeRoom(ctx, level, 1, RoomType::CubeBlocking);
     makeRoom(ctx, level, 2, RoomType::CubeButtons);
+    // makeRoom(ctx, level, 0, RoomType::SinglePortalButton);
 
 #if 0
     // An alternative implementation could randomly select the type for each

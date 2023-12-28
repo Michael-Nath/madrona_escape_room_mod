@@ -151,6 +151,7 @@ enum class EntityType : uint32_t {
     Cube,
     Wall,
     Agent,
+    Portal,
     Door,
     NumTypes,
 };
@@ -166,6 +167,11 @@ struct DoorProperties {
     Entity buttons[consts::maxEntitiesPerRoom];
     int32_t numButtons;
     bool isPersistent;
+};
+
+// Similar to OpenState, true during frames where an agent is on a portal
+struct PortalState {
+    bool isOn;
 };
 
 // Similar to OpenState, true during frames where a button is pressed
@@ -257,6 +263,17 @@ struct DoorEntity : public madrona::Archetype<
     madrona::phys::broadphase::LeafID,
     OpenState,
     DoorProperties,
+    EntityType,
+    madrona::render::Renderable
+> {};
+
+// 
+struct PortalEntity : public madrona::Archetype<
+    Position,
+    Rotation,
+    Scale,
+    ObjectID,
+    PortalState,
     EntityType,
     madrona::render::Renderable
 > {};

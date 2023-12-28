@@ -2,6 +2,7 @@
 #include <madrona/render/render_mgr.hpp>
 #include <madrona/window.hpp>
 
+#include <iostream>
 #include "sim.hpp"
 #include "mgr.hpp"
 #include "types.hpp"
@@ -81,7 +82,7 @@ int main(int argc, char *argv[])
         .enableBatchRenderer = enable_batch_renderer,
         .extRenderAPI = wm.gpuAPIManager().backend(),
         .extRenderDev = render_gpu.device(),
-    });
+    });    
 
     float camera_move_speed = 10.f;
 
@@ -147,17 +148,17 @@ int main(int argc, char *argv[])
         printf("Partner\n");
         partner_printer.print();
 
-        printf("Room Entities\n");
-        room_ent_printer.print();
+        // printf("Room Entities\n");
+        // room_ent_printer.print();
 
-        printf("Door\n");
-        door_printer.print();
+        // printf("Door\n");
+        // door_printer.print();
 
-        printf("Lidar\n");
-        lidar_printer.print();
+        // printf("Lidar\n");
+        // lidar_printer.print();
 
-        printf("Steps Remaining\n");
-        steps_remaining_printer.print();
+        // printf("Steps Remaining\n");
+        // steps_remaining_printer.print();
 
         printf("Reward\n");
         reward_printer.print();
